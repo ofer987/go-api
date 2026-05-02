@@ -21,9 +21,7 @@ type FullerWorld struct {
 	SurName    string     `json:"sur_name"`
 }
 
-var helloRegexp = regexp.MustCompile("Hello")
-
-func findPattern(filepath string) []byte {
+func findPattern(filepath string, pattern string) []byte {
 	fmt.Printf("filepath: %v\n", filepath)
 
 	b, err := os.ReadFile(filepath)
@@ -32,6 +30,7 @@ func findPattern(filepath string) []byte {
 		os.Exit(1)
 	}
 
+	helloRegexp := regexp.MustCompile(pattern)
 	result := helloRegexp.Find(b)
 	if result == nil {
 		fmt.Printf("Failed to find %s\n", helloRegexp)
@@ -86,7 +85,22 @@ func printHelloDanBeforeAndOferAfter(next http.Handler) http.Handler {
 }
 
 func main() {
-	result := findPattern("test.txt")
+	if len(os.Args) < 2 {
+		fmt.Printf("You forgot to give an argument for the pattern\n")
+
+		os.Exit(1)
+	}
+
+	pattern := os.Args[1]
+	if pattern == "" {
+		fmt.Printf("You forgot to give an argument for the pattern\n")
+
+		os.Exit(1)
+	}
+
+	fmt.Printf("Searching for pattern '%s' in %s", pattern, "test.txt")
+
+	result := findPattern("test.txt", pattern)
 	resultLength := len(result)
 	message := fmt.Sprintf("<div>Hello, World! %s with length %d</div>", result, resultLength)
 	messages := append([]string{}, message)
